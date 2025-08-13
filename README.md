@@ -10,44 +10,44 @@ This document presents the architecture for implementing a comprehensive alert e
 ## High-Level Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                         OpenTelemetry Collector Pod                      │
-│                                                                          │
-│  ┌──────────────┐                                                       │
-│  │    OTLP/     │                                                       │
-│  │  OTLPHTTP    │◄──── Metrics, Traces, Logs                          │
-│  │  (Receiver)  │      (OpenTelemetry & Prometheus Compatible)         │
-│  └──────┬───────┘                                                       │
-│         │                                                                │
-│         ▼                                                                │
-│  ┌──────────────────────────────────────────────────────┐              │
-│  │            Alert Evaluation Processor                 │              │
-│  │                                                       │              │
-│  │  ┌─────────────┐  ┌──────────────┐  ┌─────────────┐│              │
-│  │  │   Rule      │  │    State     │  │   Storm     ││              │
-│  │  │  Evaluator  │◄─┤    Syncer    │  │ Prevention  ││              │
-│  │  │             │  │   (TSDB)     │  │             ││              │
-│  │  └─────┬───────┘  └──────┬───────┘  └─────────────┘│              │
-│  │        │                  │                          │              │
-│  │        ▼                  ▼                          │              │
-│  │  ┌─────────────────────────────────┐                │              │
-│  │  │    Alert State Manager          │                │              │
-│  │  │  • Deduplication               │                │              │
-│  │  │  • For-duration tracking       │                │              │
-│  │  │  • Cardinality control         │                │              │
-│  │  └────────┬────────────┬──────────┘                │              │
-│  └───────────┼────────────┼────────────────────────────┘              │
-│              │            │                                             │
-│              ▼            ▼                                             │
-│  ┌──────────────┐  ┌──────────────┐                                   │
-│  │   Notifier   │  │  Prometheus  │                                   │
-│  │   Exporter   │  │  RemoteWrite │                                   │
-│  │              │  │   Exporter   │                                   │
-│  └──────┬───────┘  └──────┬───────┘                                   │
-│         │                  │                                             │
-└─────────┼──────────────────┼─────────────────────────────────────────┘
-          │                  │
-          ▼                  ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│                         OpenTelemetry Collector Pod                 │
+│                                                                     │
+│  ┌──────────────┐                                                   │
+│  │    OTLP/     │                                                   │
+│  │  OTLPHTTP    │◄──── Metrics, Traces, Logs                        │
+│  │  (Receiver)  │      (OpenTelemetry & Prometheus Compatible)      │
+│  └──────┬───────┘                                                   │
+│         │                                                           │
+│         ▼                                                           │
+│  ┌──────────────────────────────────────────────────────┐           │
+│  │            Alert Evaluation Processor                │           │
+│  │                                                      │           │
+│  │  ┌─────────────┐  ┌──────────────┐  ┌─────────────┐  │           │
+│  │  │   Rule      │  │    State     │  │   Storm     │  │           │
+│  │  │  Evaluator  │◄─┤    Syncer    │  │ Prevention  │  │           │
+│  │  │             │  │   (TSDB)     │  │             │  │           │
+│  │  └─────┬───────┘  └──────┬───────┘  └─────────────┘  │           │
+│  │        │                  │                          │           │
+│  │        ▼                  ▼                          │           │
+│  │  ┌────────────────────────────────┐                  │           │
+│  │  │    Alert State Manager         │                  │           │
+│  │  │  • Deduplication               │                  │           │
+│  │  │  • For-duration tracking       │                  │           │
+│  │  │  • Cardinality control         │                  │           │
+│  │  └────────┬────────────┬──────────┘                  │           │
+│  └───────────┼────────────┼─────────────────────────────┘           │
+│              │            │                                         │
+│              ▼            ▼                                         │
+│  ┌──────────────┐  ┌──────────────┐                                 │
+│  │   Notifier   │  │  Prometheus  │                                 │
+│  │   Exporter   │  │  RemoteWrite │                                 │
+│  │              │  │   Exporter   │                                 │
+│  └──────┬───────┘  └──────┬───────┘                                 │
+│         │                 │                                         │
+└─────────┼─────────────────┼─────────────────────────────────────────┘
+          │                 │
+          ▼                 ▼
     ┌─────────────┐    ┌─────────────┐
     │AlertManager │    │    TSDB     │
     │  Cluster    │    │(Prometheus/ │
