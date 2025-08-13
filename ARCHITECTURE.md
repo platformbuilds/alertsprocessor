@@ -319,56 +319,7 @@ cardinality_control:
     alert_on_limit: true
 ```
 
-### 6. Multi-Tenancy Support
-
-Complete tenant isolation and resource management:
-
-```yaml
-multi_tenancy:
-  # Tenant identification
-  tenant_extraction:
-    source: "header"  # header|label|resource_attribute
-    header_name: "X-Scope-OrgID"
-    label_name: "tenant_id"
-    attribute_name: "tenant.id"
-  
-  # Per-tenant configuration
-  tenant_limits:
-    default:
-      max_rules: 100
-      max_active_alerts: 1000
-      max_series_cardinality: 10000
-      min_evaluation_interval: 10s
-    
-    overrides:
-      tenant_premium:
-        max_rules: 1000
-        max_active_alerts: 10000
-        max_series_cardinality: 100000
-        min_evaluation_interval: 5s
-  
-  # Tenant isolation
-  isolation:
-    mode: "strict"  # strict|soft
-    separate_state_series: true
-    separate_notification_queues: true
-    
-    # Tenant-specific endpoints
-    routing:
-      tenant_a:
-        alertmanager: "https://am-tenant-a.internal"
-        remote_write: "https://tsdb-tenant-a.internal"
-      tenant_b:
-        alertmanager: "https://am-tenant-b.internal"
-        remote_write: "https://tsdb-tenant-b.internal"
-      
-      # Default routing with tenant injection
-      default:
-        alertmanager: "https://alertmanager.internal"
-        inject_tenant_header: true
-```
-
-### 7. High Availability Architecture
+### 6. High Availability Architecture
 
 Three HA deployment models supported:
 
@@ -1019,4 +970,4 @@ otelCollector:
 
 The OpenTelemetry Alert Processor architecture represents a paradigm shift in observability alerting, moving from query-based evaluation to stream processing while maintaining full compatibility with existing Prometheus-based workflows. By leveraging TSDB for distributed state management and implementing comprehensive deduplication and storm prevention mechanisms, this design provides a production-ready, scalable, and efficient alerting solution that unifies metrics, logs, and traces alerting within a single pipeline.
 
-The architecture's support for multiple data formats, multi-tenancy, and various high-availability modes ensures it can adapt to diverse operational requirements while maintaining simplicity and reliability. This positions the OpenTelemetry Alert Processor as a next-generation alerting solution for modern cloud-native environments.
+The architecture's support for multiple data formats and various high-availability modes ensures it can adapt to diverse operational requirements while maintaining simplicity and reliability. This positions the OpenTelemetry Alert Processor as a next-generation alerting solution for modern cloud-native environments.
