@@ -33,3 +33,24 @@ processors:
       initial_interval: 200ms
       max_interval: 5s
       max_batch_size: 32
+    rules:
+      - id: high_error_logs
+        name: HighErrorLogs
+        signal: logs
+        for: 0s
+        labels: { severity: error }
+        logs:
+          severity_at_least: ERROR
+          body_contains: "timeout"
+          group_by: ["service.name"]
+          count_threshold: 3
+      - id: slow_spans
+        name: SlowSpans
+        signal: traces
+        for: 2s
+        labels: { severity: warning }
+        traces:
+          latency_ms_gt: 500
+          status_not_ok: false
+          group_by: ["service.name","span.name"]
+          count_threshold: 2
